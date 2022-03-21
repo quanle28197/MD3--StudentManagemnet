@@ -31,7 +31,7 @@ CREATE TABLE Course(
 
 CREATE TABLE Point(
     idPoint   INT     NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    point     FLOAT   DEFAULT 0 CHECK ( point BETWEEN 0  AND 100),
+    point     INT   DEFAULT 0 CHECK ( point BETWEEN 0  AND 100),
     idCourse INT      NOT NULL,
     idStudent   INT   NOT NULL,
     FOREIGN KEY (idCourse) REFERENCES Course(idCourse),
@@ -40,9 +40,9 @@ CREATE TABLE Point(
 
 INSERT INTO Address VALUES (1,'365, Bach Mai, Ha Noi'),
 (2,'119 Tran Duy Hung, Cau Giay'),
-(3,'So 6 nha Tho, Hoan Kiem'),
-(4,'24 Ly Dao Thanh, Hoan Kiem'),
-(5,'32 Ba Trieu, Hai Ba Trung');
+(3,'So 6 nha Tho, Ha Nam'),
+(4,'24 Ly Dao Thanh, Nam Dinh'),
+(5,'32 Ba Trieu, Hai Phong');
 
 
 INSERT INTO Classes VALUES (1,'Lop 1', 'Tieng Viet', 'lop tieu hoc'),
@@ -97,9 +97,28 @@ SELECT idStudent,fullName FROM Students WHERE idStudent = 12;
 
 
 #Thong ke so luong hoc vien tai cac lop
-SELECT * FROM Students;
+SELECT * FROM Students LEFT JOIN Address A on Students.idAddress = A.idAddress;
 
-#Thong ke so luong hoc vien tai cac tinh
+#Thống kê số lượng học viên tại các tỉnh (count)
+SELECT COUNT(address), A.address FROM Students join Address A on Students.idAddress = A.idAddress group by address;
+SELECT NameClasses, COUNT(idStudent) FROM Classes join Students S on Classes.idClasses = S.idClass group by Classes.NameClasses;
+SELECT C.NameClasses, S.fullName from Classes C join Students S on C.idClasses = S.idClass;
+
+
+#Tinh diem trug binh cua cac khoa hoc(AVG)
+SELECT AVG(point), count(nameCourse), nameCourse
+    FROM Course
+    join Point P on Course.idCourse = P.idCourse
+    group by nameCourse;
+
+#Đưa ra khóa học có điểm trung bình cao nhất (max)
+select nameCourse, avg(point) as avg_point
+from Point
+join Course c on Point.idCourse = c.idCourse
+group by nameCourse having  avg_point >= ALL
+(SELECT avg(point) as avg_point from Point
+join Course c on Point.idCourse = c.idCourse
+group by c.nameCourse);
 
 
 
